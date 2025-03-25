@@ -1,14 +1,19 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
+// Firebase configuration
 const firebaseConfig = {
-  apiKey: "YOUR_FIREBASE_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID",
+  apiKey: "AIzaSyBRLqbkVAcms8Cd7uewhbKfHfG-VboHfXM",
+  authDomain: "fir-setup-20637.firebaseapp.com",
+  projectId: "fir-setup-20637",
+  storageBucket: "fir-setup-20637.appspot.com", // ✅ Fixed this
+  messagingSenderId: "634158707495",
+  appId: "1:634158707495:web:11e4240364c6d0f47e6f02",
+  measurementId: "G-XMVQJZWX5N"
 };
 
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+// Ensure Firebase is initialized only once
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+const auth = getAuth(app);
+
+export { app, auth }; // ✅ Now `auth` is properly exported
