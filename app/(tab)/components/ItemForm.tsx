@@ -1,6 +1,8 @@
-import React, { useState } from "react";
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, Image } from "react-native";
-import * as ImagePicker from "expo-image-picker"; // ✅ Use Expo's ImagePicker
+import React, { useState, useEffect } from "react";
+import { 
+  View, TextInput, TouchableOpacity, Text, StyleSheet, Image, Alert 
+} from "react-native";
+import * as ImagePicker from "expo-image-picker";
 
 interface Item {
   id: number;
@@ -11,19 +13,26 @@ interface Item {
 
 interface ItemFormProps {
   onSubmit: (item: Item) => void;
-  item?: Item | null;
+  editingItem: Item | null;
 }
 
-export default function ItemForm({ onSubmit, item }: ItemFormProps) {
-  const [name, setName] = useState(item ? item.name : "");
-  const [details, setDetails] = useState(item ? item.details : "");
-  const [image, setImage] = useState<string | null>(item ? item.image : null);
+export default function ItemForm({ onSubmit, editingItem }: ItemFormProps) {
+  const [name, setName] = useState(editingItem?.name || "");
+  const [details, setDetails] = useState(editingItem?.details || "");
+  const [image, setImage] = useState<string | null>(editingItem?.image || null);
 
-  // ✅ Request Permission Before Picking an Image
+  useEffect(() => {
+    if (editingItem) {
+      setName(editingItem.name);
+      setDetails(editingItem.details);
+      setImage(editingItem.image);
+    }
+  }, [editingItem]);
+
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      alert("Sorry, we need camera roll permissions to make this work!");
+      alert("Permission required to access gallery!");
       return;
     }
 
@@ -40,35 +49,45 @@ export default function ItemForm({ onSubmit, item }: ItemFormProps) {
   };
 
   const handleSubmit = () => {
-    if (!name || !details) return;
-    onSubmit({ id: item?.id || Date.now(), name, details, image });
+    if (!name || !details) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+
+    const newItem: Item = {
+      id: editingItem ? editingItem.id : Date.now(),
+      name,
+      details,
+      image,
+    };
+
+    onSubmit(newItem);
     setName("");
     setDetails("");
     setImage(null);
   };
 
   return (
-    <View style={styles.container}>
+    <View>
       <TextInput placeholder="Enter Name" value={name} onChangeText={setName} style={styles.input} />
       <TextInput placeholder="Enter Details" value={details} onChangeText={setDetails} style={styles.input} />
       {image && <Image source={{ uri: image }} style={styles.previewImage} />}
-      
+
       <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
         <Text style={styles.buttonText}>Pick Image</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>{item ? "Update Item" : "Add Item"}</Text>
+        <Text style={styles.buttonText}>{editingItem ? "Update Item" : "Add Item"}</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { marginVertical: 10 },
   input: { borderWidth: 1, borderColor: "#ccc", padding: 10, marginBottom: 10, borderRadius: 5 },
   previewImage: { width: "100%", height: 150, borderRadius: 8, marginBottom: 10 },
   imageButton: { backgroundColor: "#28A745", padding: 10, alignItems: "center", borderRadius: 5, marginBottom: 10 },
-  button: { backgroundColor: "#06453d", padding: 10, alignItems: "center", borderRadius: 5 },
+  button: { backgroundColor: "#06453d", padding: 10, alignItems: "center", borderRadius: 5, marginBottom: 10 },
   buttonText: { color: "#fff", fontWeight: "bold" },
 });
