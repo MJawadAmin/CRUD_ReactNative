@@ -9,14 +9,21 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "urlSchemes": ["com.anonymous.CRUD_ReactNative"]
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.CRUD_ReactNative"
+      "package": "com.anonymous.CRUD_ReactNative",
+      "googleServicesFile": "./google-services.json",
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -44,7 +51,8 @@
       },
       "eas": {
         "projectId": "68bef717-19d8-4a35-aad7-aa8f8b0e7517"
-      }
+      },
+      "apiUrl": "https://your-api.com"
     }
   }
 }
